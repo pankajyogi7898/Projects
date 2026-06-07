@@ -1,0 +1,29 @@
+.cli-window {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 10rem;
+}
+
+.cli-window div[name="react-console-emulator"] {
+    width: 100%;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid #00ff88;
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.25);
+
+    box-sizing: border-box;
+}
+
+.cli-window div[name="react-console-emulator__content"] {
+    height: auto !important;
+    min-height: auto !important;
+    box-sizing: border-box !important;
+}
