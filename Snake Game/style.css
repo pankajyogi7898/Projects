@@ -1,0 +1,148 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+:root {
+    /* background color */
+    --background-color: #0f0f0f;
+    --bg-fill-color: #f4f4f4;
+    --bg-food-color: #0fb1f6;
+
+
+    /* text color */
+    --text-color: #e5e5e5;
+
+    /* border-radius */
+    --border-radius: 10px;
+
+    /* border */
+    --border-color: #4b4b4b;
+
+    /* spacing  */
+    --spacing-sm: 4px;
+    --spacing-md: 8px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+    --spacing-2xl: 24px;
+    --spacing-3xl: 32px;
+
+    /* font size */
+    --font-size-sm: 12px;
+    --font-size-md: 16px;
+    --font-size-lg: 24px;
+    --font-size-xl: 32px;
+}
+
+html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+main,
+section {
+    height: 100%;
+    width: 100%;
+}
+
+.btn {
+    padding: var(--spacing-md) var(--font-size-md);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    transition: all 0.3s ease;
+
+}
+
+.btn:hover {
+    transform: scale(1.1);
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-3xl);
+
+}
+
+.infos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-2xl);
+}
+
+.info {
+    border-radius: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--border-color);
+}
+
+.info h1 {
+    font-size: var(--font-size-lg);
+}
+
+.board {
+    border: 1px solid var(--border-color);
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(40px, 1fr));
+}
+
+.block {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+}
+
+.fill {
+    background-color: var(--bg-fill-color);
+
+}
+
+.food {
+    background-color: var(--bg-food-color);
+
+}
+
+.modal {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    background-color: #35353587;
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal .start-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-3xl);
+}
+
+.start-game h3 {
+    font-size: var(--font-size-xl);
+}
+
+.modal .game-over {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-3xl);
+    display: none;
+}
