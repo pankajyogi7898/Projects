@@ -4,7 +4,8 @@ import "./style.scss"
 import { useAuth } from "../hooks/useAuth"
 const Login = () => {
 
-    const { loading, handleLogin } = useAuth()
+    const { handleLogin } = useAuth()
+
     const Navigate = useNavigate()
 
     const [email, setEmail] = useState("")
@@ -12,7 +13,7 @@ const Login = () => {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        await handleLogin({email, password })
+        await handleLogin({ email, password })
         Navigate("/")
     }
 
@@ -51,7 +52,7 @@ const Login = () => {
                         Login
                     </button>
 
-                    <p>
+                    <p className="para">
                         Don't have an account? <Link to="/register">Register</Link>
                     </p>
 

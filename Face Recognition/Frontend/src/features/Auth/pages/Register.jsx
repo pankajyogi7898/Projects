@@ -68,7 +68,7 @@ const Register = () => {
                         Register
                     </button>
 
-                    <p>
+                    <p className="para">
                         You have an already account. <Link to="/login">Login</Link>
                     </p>
 
