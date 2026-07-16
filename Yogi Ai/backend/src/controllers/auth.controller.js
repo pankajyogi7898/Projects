@@ -22,6 +22,7 @@ export async function userRegister(req, res) {
         username,
         password,
         email,
+        lastVerificationEmailSentAt: new Date()
     });
 
     const emailVerifyToken = jwt.sign({
@@ -57,7 +58,6 @@ export async function userRegister(req, res) {
 
 export async function userLogin(req, res) {
     const { email, password } = req.body
-
     const user = await userModel.findOne({ email })
     if (!user) {
         return res.status(400).json({
@@ -66,8 +66,9 @@ export async function userLogin(req, res) {
             err: "user is not found!"
         })
     }
-
     const isPassMatched = await user.comparePassword(password);
+
+    console.log("isPassMatched:", isPassMatched);
     if (!isPassMatched) {
         return res.status(400).json({
             message: "invalid email and password",
@@ -135,13 +136,29 @@ export async function verifyEmail(req, res) {
 
     const user = await userModel.findOne({ email: decoded.email })
 
-    console.log(user)
 
     if (!user) {
         return res.status(404).json({
             success: false,
             message: "User not found"
         });
+    }
+
+    if (user.verified) {
+        return res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Already Verified</title>
+    </head>
+    <body style="font-family:Arial;text-align:center;padding-top:100px;">
+        <h1>✅ Email Already Verified</h1>
+        <p>Your account is already verified.</p>
+        <p>Please login from the application.</p>
+        <a href="http://localhost:3000/api/auth/login">Click here to login</a>
+    </body>
+    </html>
+    `);
     }
 
     user.verified = true;
@@ -151,12 +168,78 @@ export async function verifyEmail(req, res) {
     const html = `
     <h1> Email Verified Successfully..</h1>
     <p>Thank you for verifying your email address. </p>
-    <a href="http://localhost:3000/login">Click here to login</a>`
+    <a href="http://localhost:3000/api/auth/login">Click here to login</a>`
 
     res.send(html);
 
     res.status(200).json({
         message: "Email Verify successfully"
     })
+
+}
+
+export async function resendEmail(req, res) {
+
+    const { email } = req.body
+
+    const user = await userModel.findOne({ email: email })
+
+    if (!user) {
+        return res.status(404).json({
+            message: "user not found",
+            success: false,
+            err: "invalid credential"
+        })
+    }
+
+    if (user.verified) {
+        return res.json({
+            message: "Email already verified"
+        })
+    }
+    const now = Date.now();
+    const lastSent = new Date(user.lastVerificationEmailSentAt).getTime();
+
+    if (now - lastSent < 10 * 1000) {
+        return res.status(429).json({
+            success: false,
+            message: "Please wait 10 seconds before requesting another email."
+        });
+    }
+
+    const emailVerifyToken = jwt.sign({
+        email: user.email
+    }, process.env.JWT_SECRET)
+
+
+    await sendEmail({
+        to: email,
+        subject: "Welcome to Yogi AI  ",
+        html:
+            `
+                <h1>Welcome, ${user.username}!
+                </h1><p>Thank you for registering with us.</p>
+                <p>We're excited to have you on board and look forward to providing you with the best experience possible.</p>
+                <p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
+                <p>To verify your email address, please click the link below :</p>
+                <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerifyToken}">Verify Email</a>
+                <p>Best regards,</p>
+                <p>The Yogi AI Team</p>`,
+    })
+
+    user.lastVerificationEmailSentAt = new Date();
+
+    await user.save();
+
+    res.status(200).json({
+        message: "Verification email sent successfully.",
+        success: true,
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        }
+    })
+
 
 }

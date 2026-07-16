@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        lastVerificationEmailSentAt: {
+            type: Date,
+            default: Date.now
+        }
     },
     {
         timestamps: true,
