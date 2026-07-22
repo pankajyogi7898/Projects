@@ -21,3 +21,7 @@ export function getMe() {
     const response = api.get("/api/auth/get-me")
     return response
 }
+export function resendEmail(email) {
+    const response = api.post('/api/auth/resend-email', { email })
+    return response
+}

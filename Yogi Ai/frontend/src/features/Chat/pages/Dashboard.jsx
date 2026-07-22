@@ -30,11 +30,11 @@ const Dashboard = () => {
     }
 
     const openChat = (chatId) => {
-        chat.handleOpenChat(chatId)
+        chat.handleOpenChat(chatId, chats)
     }
 
     return (
-        <main className='min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 text-white md:p-5'>
+        <main className='min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 text-white md:p-5 no-scrollbar'>
             <section className='mx-auto flex flex-col md:flex-row h-[calc(100vh-1rem)] w-full max-w-[1440px] gap-3 rounded-[32px] border border-cyan-600/10 bg-slate-950/90 px-4 py-4 shadow-[0_45px_120px_-60px_rgba(14,165,233,0.65)] md:h-[calc(100vh-1.5rem)] md:gap-4 md:px-5 md:py-5'>
                 <aside className='flex h-auto w-full flex-col rounded-[32px] border border-slate-700/70 bg-slate-900/85 p-3 md:h-full md:w-64 md:flex md:flex-col'>
                     <div className='mb-6 flex items-center justify-between gap-4'>
@@ -71,7 +71,7 @@ const Dashboard = () => {
                                 >
                                     {message.role === 'ai' ? (
                                         <div className='prose prose-invert overflow-x-auto text-sm leading-7 prose-p:my-0 prose-ul:pl-5 prose-li:marker:text-cyan-400'>
-                                            <ReactMarkdown>
+                                            <ReactMarkdown >
                                                 {message.content}
                                             </ReactMarkdown>
                                         </div>

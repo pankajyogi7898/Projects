@@ -17,6 +17,8 @@
     "@langchain/google-genai": "^2.2.0",
     "@langchain/mistralai": "^1.2.0",
     "@langchain/openai": "^1.5.5",
+    "@langchain/tavily": "^1.2.0",
+    "@tavily/core": "^0.7.6",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -25,10 +27,13 @@
     "express-validator": "^7.3.2",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.3",
+    "langchain": "^1.5.3",
     "mongoose": "^9.7.4",
     "morgan": "^1.11.0",
     "nodemailer": "^9.0.3",
+    "remark-gfm": "^4.0.1",
     "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "zod": "^4.4.3"
   }
 }
