@@ -1,33 +1,64 @@
 import { initializeSocketConnection } from "../service/chat.socket"
 import { sendMessage, getChats, getMessages, deleteChat } from "../service/chat.api";
-import { setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages } from "../chat.slice";
+import {
+    setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
+    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex
+} from "../chat.slice";
+
 import { useDispatch } from "react-redux";
 
 export const useChat = () => {
-
     const dispatch = useDispatch()
 
     async function handleSendMessage({ message, chatId }) {
-        dispatch(setLoading(true))
-        const data = await sendMessage({ message, chatId })
-        const { chat, aimessage } = data
-        if (!chatId) {
-            dispatch(createNewChat({
-                chatId: chat._id,
-                title: chat.title,
-            }))
+        dispatch(setLoading(true));
+        let activeChatId = chatId;
+        try {
+            // Agar pehle se chat hai to user message turant dikhao
+            if (activeChatId) {
+                dispatch(addOptimisticMessage({
+                    chatId: activeChatId,
+                    content: message,
+                    role: "user"
+                }));
+                dispatch(addThinkingMessage({
+                    chatId: activeChatId
+                }));
+            }
+            const data = await sendMessage({
+                message,
+                chatId: activeChatId
+            });
+            const { chat, aimessage } = data;
+            // Agar naya chat tha
+            if (!activeChatId) {
+                dispatch(createNewChat({
+                    chatId: chat._id,
+                    title: chat.title
+                }));
+                dispatch(addNewMessage({
+                    chatId: chat._id,
+                    content: message,
+                    role: "user"
+                }));
+                activeChatId = chat._id;
+            }
+            dispatch(replaceThinkingMessage({
+                chatId: activeChatId,
+                content: aimessage.content
+            }));
+            dispatch(setCurrentChatId(activeChatId));
+        } catch (err) {
+            if (activeChatId) {
+                dispatch(removeThinkingMessage({
+                    chatId: activeChatId
+                }));
+            }
+            console.log(err);
+        } finally {
+            dispatch(setLoading(false));
         }
-        dispatch(addNewMessage({
-            chatId: chatId || chat._id,
-            content: message,
-            role: "user",
-        }))
-        dispatch(addNewMessage({
-            chatId: chatId || chat._id,
-            content: aimessage.content,
-            role: aimessage.role,
-        }))
-        dispatch(setCurrentChatId(chat._id))
+
     }
 
     async function handlegetChats() {
@@ -63,11 +94,23 @@ export const useChat = () => {
         dispatch(setCurrentChatId(chatId))
     }
 
+    const handleCopyMessage = (content, index) => {
+        navigator.clipboard.writeText(content)
+        dispatch(setCopiedIndex(index))
+        setTimeout(() => dispatch(setCopiedIndex(null)), 1500)
+    }
+
+    const handleCreateNewChat = () => {
+        dispatch(setCurrentChatId(null))
+    }
+
     return {
         initializeSocketConnection,
         handleSendMessage,
         handlegetChats,
-        handleOpenChat
+        handleOpenChat,
+        handleCopyMessage,
+        handleCreateNewChat
     }
 }
 

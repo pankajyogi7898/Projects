@@ -31,59 +31,59 @@ const agent = createAgent({
     tools: [searchInternetTool]
 })
 
-export async function responseGenerate(messages) {
-    console.log("Before invoke");
-
-    const response = await agent.invoke({
-        messages: [
-            new SystemMessage("You are Yogi AI"),
-            ...messages.map(msg =>
-                msg.role === "user"
-                    ? new HumanMessage(msg.content)
-                    : new AIMessage(msg.content)
-            )
-        ]
-    });
-
-    console.log("After invoke");
-    console.log(response);
-
-    return response.messages.at(-1).text;
-}
-
-
 // export async function responseGenerate(messages) {
+//     console.log("Before invoke");
+
 //     const response = await agent.invoke({
 //         messages: [
-//             new SystemMessage(`
-//                                 You are Yogi AI, a professional AI assistant.
-
-//                                 Always respond in beautiful GitHub Markdown.
-
-//                             Rules:
-//                                 - Use H1/H2/H3 headings.
-//                                 - Use bullet points.
-//                                 - Use numbered lists whenever appropriate.
-//                                 - Use tables for comparisons.
-//                                 - Use **bold** for important concepts.
-//                                 - Use emojis where they improve readability.
-//                                 - Use fenced code blocks with language names.
-//                                 - Leave blank lines between sections.
-//                                 - Never reply in one long paragraph.
-//                                 - Make answers visually attractive like ChatGPT or Claude.
-//                                 - If explaining programming, always include examples and code.`),
-//             ...messages.map(msg => {
-//                 if (msg.role === "user") {
-//                     return new HumanMessage(msg.content);
-//                 } else {
-//                     return new AIMessage(msg.content);
-//                 }
-//             })
+//             new SystemMessage("You are Yogi AI"),
+//             ...messages.map(msg =>
+//                 msg.role === "user"
+//                     ? new HumanMessage(msg.content)
+//                     : new AIMessage(msg.content)
+//             )
 //         ]
-//     })
+//     });
 
-//     return response.messages[response.messages.length - 1].text
+//     console.log("After invoke");
+//     console.log(response);
+
+//     return response.messages.at(-1).text;
 // }
+
+
+export async function responseGenerate(messages) {
+    const response = await agent.invoke({
+        messages: [
+            new SystemMessage(`
+                                You are Yogi AI, a professional AI assistant.
+
+                                Always respond in beautiful GitHub Markdown.
+
+                            Rules:
+                                - Use H1/H2/H3 headings.
+                                - Use bullet points.
+                                - Use numbered lists whenever appropriate.
+                                - Use tables for comparisons.
+                                - Use **bold** for important concepts.
+                                - Use emojis where they improve readability.
+                                - Use fenced code blocks with language names.
+                                - Leave blank lines between sections.
+                                - Never reply in one long paragraph.
+                                - Make answers visually attractive like ChatGPT or Claude.
+                                - If explaining programming, always include examples and code.`),
+            ...messages.map(msg => {
+                if (msg.role === "user") {
+                    return new HumanMessage(msg.content);
+                } else {
+                    return new AIMessage(msg.content);
+                }
+            })
+        ]
+    })
+
+    return response.messages[response.messages.length - 1].text
+}
 
 export async function generateChatTitle(message) {
     const response = await titleModel.invoke([

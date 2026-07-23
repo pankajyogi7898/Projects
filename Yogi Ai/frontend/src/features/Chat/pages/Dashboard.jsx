@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import ReactMarkdown from 'react-markdown'
 import { useChat } from '../hooks/useChat'
+import ThemeToggle from '../components/ThemeToggle'
 
 const Dashboard = () => {
     const chat = useChat()
-
+    const user = useSelector((state) => state.auth.user)
     const [chatInput, setChatInput] = useState('')
-    const [userMessage, setUserMessage] = useState('')
 
     const chats = useSelector((state) => state.chat.chats)
     const currentChatId = useSelector((state) => state.chat.currentChatId)
+    const copiedIndex = useSelector((state) => state.chat.copiedIndex)
 
     useEffect(() => {
         chat.initializeSocketConnection()
@@ -33,81 +34,231 @@ const Dashboard = () => {
         chat.handleOpenChat(chatId, chats)
     }
 
-    return (
-        <main className='min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 text-white md:p-5 no-scrollbar'>
-            <section className='mx-auto flex flex-col md:flex-row h-[calc(100vh-1rem)] w-full max-w-[1440px] gap-3 rounded-[32px] border border-cyan-600/10 bg-slate-950/90 px-4 py-4 shadow-[0_45px_120px_-60px_rgba(14,165,233,0.65)] md:h-[calc(100vh-1.5rem)] md:gap-4 md:px-5 md:py-5'>
-                <aside className='flex h-auto w-full flex-col rounded-[32px] border border-slate-700/70 bg-slate-900/85 p-3 md:h-full md:w-64 md:flex md:flex-col'>
-                    <div className='mb-6 flex items-center justify-between gap-4'>
-                        {/* <div>
-                            <h1 className='text-3xl font-semibold text-white'>Yogi AI</h1>
-                        </div> */}
-                        <div className='inline-flex h-9 w-20 items-center justify-center rounded-3xl bg-cyan-300/15 text-orange-400 shadow-[0_8px_30px_-18px_rgba(56,189,248,0.9)]'>Yogi AI</div>
-                    </div>
+    const hasMessages = chats[currentChatId]?.messages.length > 0
+    const chatList = Object.values(chats)
 
-                    <div className='space-y-3 overflow-y-auto pr-1'>
-                        {Object.values(chats).map((chat, index) => (
+    return (
+        <main className='flex min-h-screen w-full bg-black text-white'>
+            {/* Sidebar */}
+            <aside className='hidden h-screen w-64 flex-col border-r border-white/10 bg-black px-3 py-4 md:flex'>
+                <div className='mb-6 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2.5 text-sm font-medium text-white'>
+                    <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
+                        <path d='M12 2l2.2 4.6L19 8l-3.6 3.2.9 5-4.3-2.5-4.3 2.5.9-5L5 8l4.8-1.4z' />
+                    </svg>
+                    Search
+                </div>
+
+                <nav className='space-y-1 text-sm text-white/70'>
+                    <button type='button' className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-white/5 hover:text-white'>
+                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'><circle cx='12' cy='12' r='9' /><path d='M12 7v5l3 2' /></svg>
+                        Chats
+                    </button>
+
+                    <button type='button' className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-white/5 hover:text-white'>
+                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'><rect x='3' y='3' width='18' height='18' rx='4' /><circle cx='12' cy='12' r='4' /></svg>
+                        Insta Post
+                    </button>
+                </nav>
+
+                <button
+                    type='button'
+                    onClick={() => chat.handleCreateNewChat()}
+                    className='mt-3 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/5 hover:text-white'
+                >
+                    <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'><path d='M12 5v14M5 12h14' /></svg>
+                    New Chat
+                </button>
+
+                <div className='mt-6 flex-1 overflow-y-auto pr-1'>
+                    <p className='mb-2 px-3 text-[11px] font-semibold uppercase tracking-wide text-white/40'>Recent</p>
+                    <div className='space-y-1'>
+                        {chatList.slice(0, 6).map((c, index) => (
                             <button
-                                onClick={() => { openChat(chat.id) }}
                                 key={index}
                                 type='button'
-                                className='w-full cursor-pointer  rounded-[24px] border border-slate-700/70 bg-slate-950/80 px-4 py-3 text-left text-sm font-medium text-slate-100 transition hover:border-cyan-400/40 hover:bg-slate-900/90 hover:text-white'
+                                onClick={() => openChat(c.id)}
+                                className={`w-full truncate rounded-lg px-3 py-2 text-left text-sm transition hover:bg-white/5 hover:text-white ${c.id === currentChatId ? 'bg-white/5 text-white' : 'text-white/60'
+                                    }`}
                             >
-                                {chat.title}
+                                {c.title}
                             </button>
                         ))}
                     </div>
-                </aside>
+                    {chatList.length > 6 && (
+                        <button type='button' className='mt-2 px-3 text-xs font-medium text-cyan-400 hover:text-cyan-300'>
+                            View All
+                        </button>
+                    )}
+                </div>
 
-                <section className='relative flex h-full min-w-0 flex-1 flex-col gap-5 overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900/80 via-slate-950/75 to-slate-900/90 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'>
-                    <div className='messages flex-1 space-y-6 overflow-y-auto pr-2'>
-                        {chats[currentChatId]?.messages.length > 0 ? (
-                            chats[currentChatId].messages.map((message, index) => (
+                <div className='mt-4 border-t border-white/10 pt-4'>
+                    <ThemeToggle />
+                    <div className='flex items-center gap-2 px-3 py-1'>
+                        <div className='flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-md font-semibold'>
+                            {(user?.username || 'U').slice(0, 1).toUpperCase()}
+                        </div>
+                        <span className='text-md font-medium text-white/80'>{user?.username || 'account'}</span>
+                    </div>
+                </div>
+            </aside>
+
+            {/* Main */}
+            <section className='flex h-screen flex-1 flex-col'>
+                {!hasMessages ? (
+                    <div className='flex flex-1 flex-col items-center justify-center px-4'>
+                        <div className='mb-10 flex items-center gap-3'>
+                            <svg width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.3'>
+                                <path d='M12 2l2.2 4.6L19 8l-3.6 3.2.9 5-4.3-2.5-4.3 2.5.9-5L5 8l4.8-1.4z' />
+                            </svg>
+                            <h1 className='text-4xl font-light tracking-tight text-white/90'>Yogi AI</h1>
+                        </div>
+
+                        <div className='mb-4 flex flex-wrap items-center justify-center gap-2'>
+                            {['Trending Tech', 'Startups', 'AI Tools', 'Gadgets'].map((label) => (
+                                <button
+                                    key={label}
+                                    type='button'
+                                    className='rounded-full border border-white/15 px-4 py-2 text-sm text-white/70 transition hover:border-white/30 hover:text-white'
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <form onSubmit={handleSubmitMessage} className='w-full max-w-2xl'>
+                            <div className='rounded-3xl border border-white/10 bg-white/5 p-3'>
+                                <input
+                                    type='text'
+                                    value={chatInput}
+                                    onChange={(event) => setChatInput(event.target.value)}
+                                    placeholder='Ask anything...'
+                                    className='mb-3 w-full bg-transparent px-2 pt-1 text-base text-white outline-none placeholder:text-white/40'
+                                />
+                                <div className='flex items-center justify-between px-1'>
+                                    <button type='button' className='flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition hover:bg-white/10'>
+                                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.8'><path d='M12 5v14M5 12h14' /></svg>
+                                    </button>
+                                    <div className='flex items-center gap-2'>
+                                        <button type='button' className='flex h-9 w-9 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white'>
+                                            <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.8'><rect x='9' y='2' width='6' height='12' rx='3' /><path d='M5 11a7 7 0 0014 0M12 18v3' /></svg>
+                                        </button>
+                                        <button
+                                            type='submit'
+                                            disabled={!chatInput.trim()}
+                                            className='flex h-9 w-9 items-center justify-center rounded-full bg-orange-400 text-black transition disabled:cursor-not-allowed hover:cursor-pointer disabled:opacity-40'
+                                        >
+                                            <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='M12 19V5M5 12l7-7 7 7' /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                ) : (
+                    <>
+                        <div className='messages flex-1 space-y-6 overflow-y-auto px-6 py-6'>
+                            {chats[currentChatId].messages.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`max-w-[82%] w-fit rounded-[28px] px-5 py-4 text-sm leading-7 transition ${message.role === 'user'
-                                        ? 'ml-auto rounded-br-[8px] bg-cyan-500/15 text-cyan-50 shadow-[0_24px_60px_-48px_rgba(34,211,238,0.7)]'
-                                        : 'mr-auto rounded-bl-[8px] border border-white/10 bg-slate-900/85 text-slate-200'
+                                    className={`max-w-[75%] w-fit rounded-2xl px-4 py-3 text-sm leading-7 ${message.role === 'user'
+                                        ? 'ml-auto bg-white/10 text-white'
+                                        : 'mr-auto text-white/90'
                                         }`}
                                 >
                                     {message.role === 'ai' ? (
-                                        <div className='prose prose-invert overflow-x-auto text-sm leading-7 prose-p:my-0 prose-ul:pl-5 prose-li:marker:text-cyan-400'>
-                                            <ReactMarkdown >
-                                                {message.content}
-                                            </ReactMarkdown>
-                                        </div>
+                                        <>
+                                            <div className='prose prose-invert text-sm leading-7 prose-p:my-0'>
+                                                <ReactMarkdown
+                                                    components={{
+                                                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-7 text-white/90">{children}</p>,
+                                                        h1: ({ children }) => <h1 className="mb-4 text-3xl font-bold">{children}</h1>,
+                                                        h2: ({ children }) => <h2 className="mb-3 text-2xl font-semibold">{children}</h2>,
+                                                        h3: ({ children }) => <h3 className="mb-2 text-xl font-semibold">{children}</h3>,
+                                                        ul: ({ children }) => <ul className="mb-3 list-disc pl-6 space-y-1">{children}</ul>,
+                                                        ol: ({ children }) => <ol className="mb-3 list-decimal pl-6 space-y-1">{children}</ol>,
+                                                        li: ({ children }) => <li className="leading-7">{children}</li>,
+                                                        strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                                                        em: ({ children }) => <em className="italic">{children}</em>,
+                                                        blockquote: ({ children }) => <blockquote className="my-3 border-l-4 border-cyan-500 pl-4 italic text-white/70">{children}</blockquote>,
+                                                        a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer" className="text-cyan-400 underline">{children}</a>,
+                                                        hr: () => <hr className="my-5 border-white/10" />,
+                                                        code: ({ children }) => <code className="rounded px-1.5 py-0.5 font-mono text-sm">{children}</code>,
+                                                        pre: ({ children }) => <pre className="my-3 overflow-x-auto rounded-xl bg-zinc-900 p-4">{children}</pre>,
+                                                    }}
+                                                >{message.content}</ReactMarkdown>
+                                            </div>
 
+                                            <div className='mt-3 flex flex-row items-center gap-6 text-white'>
+                                                <button
+                                                    type='button'
+                                                    onClick={() => chat.handleCopyMessage(message.content, index)}
+                                                    className='transition hover:text-white'
+                                                >
+                                                    {copiedIndex === index ? (
+                                                        <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                                                            <path d='M20 6L9 17l-5-5' />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
+                                                            <rect x='9' y='9' width='11' height='11' rx='2' />
+                                                            <path d='M5 15V5a2 2 0 012-2h10' />
+                                                        </svg>
+                                                    )}
+                                                </button>
+
+                                                <button
+                                                    type='button'
+                                                    onClick={() => chat.handleFeedback(index, 'up')}
+                                                    className='transition hover:text-white'
+                                                >
+                                                    <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
+                                                        <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
+                                                    </svg>
+                                                </button>
+
+                                                <button
+                                                    type='button'
+                                                    onClick={() => chat.handleFeedback(index, 'down')}
+                                                    className='transition hover:text-white'
+                                                >
+                                                    <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6' transform='rotate(180 2 2)'>
+                                                        <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </>
                                     ) : (
                                         <p className='whitespace-pre-line'>{message.content}</p>
                                     )}
                                 </div>
-                            ))
-                        ) : (
-                            <div className='flex h-full min-h-[60vh] flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-700/70 bg-slate-900/70 px-6 py-10 text-center text-slate-400'>
-                                <p className='mb-3 text-xl font-semibold text-slate-100'>Ready when you are</p>
-                                <p className='max-w-md text-sm leading-6'>Type your first message below and the AI will respond instantly. The input area is designed to be large, comfy, and easy to use.</p>
-                            </div>
-                        )}
-                    </div>
+                            ))}
+                        </div>
 
-                    <footer className='rounded-[24px] border border-cyan-500/10 bg-slate-900/90 p-2.5 shadow-[0_10px_30px_-20px_rgba(14,165,233,0.55)]'>
-                        <form onSubmit={handleSubmitMessage} className='flex flex-col gap-3 sm:flex-row'>
-                            <input
-                                type='text'
-                                value={chatInput}
-                                onChange={(event) => setChatInput(event.target.value)}
-                                placeholder='Type your message...'
-                                className='h-10 flex-1 rounded-[22px] border border-slate-700/80 bg-slate-950/95 px-3.5 text-sm text-slate-100 outline-none transition duration-200 focus:border-cyan-400/80 focus:ring-2 focus:ring-cyan-400/20 placeholder:text-slate-500'
-                            />
-                            <button
-                                type='submit'
-                                disabled={!chatInput.trim()}
-                                className='inline-flex h-10 items-center justify-center rounded-[22px] bg-gradient-to-r from-cyan-400 to-sky-500 px-5 text-sm font-semibold text-slate-950 transition hover:from-cyan-300 hover:to-sky-400 disabled:cursor-not-allowed disabled:opacity-50'
-                            >
-                                Send
-                            </button>
-                        </form>
-                    </footer>
-                </section>
+                        <div className='px-6 pb-6'>
+                            <form onSubmit={handleSubmitMessage} className='mx-auto max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-3'>
+                                <input
+                                    type='text'
+                                    value={chatInput}
+                                    onChange={(event) => setChatInput(event.target.value)}
+                                    placeholder='Ask anything...'
+                                    className='mb-3 w-full bg-transparent px-2 pt-1 text-base text-white outline-none placeholder:text-white/40'
+                                />
+                                <div className='flex items-center justify-between px-1'>
+                                    <button type='button' className='flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition hover:bg-white/10 hover:cursor-pointer'>
+                                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.8'><path d='M12 5v14M5 12h14' /></svg>
+                                    </button>
+                                    <button
+                                        type='submit'
+                                        disabled={!chatInput.trim()}
+                                        className='flex h-9 w-9 items-center justify-center rounded-full bg-orange-600 text-black transition disabled:cursor-not-allowed hover:cursor-pointer disabled:opacity-40'
+                                    >
+                                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='M12 19V5M5 12l7-7 7 7' /></svg>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </>
+                )}
             </section>
         </main>
     )
