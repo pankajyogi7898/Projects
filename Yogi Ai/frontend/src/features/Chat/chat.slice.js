@@ -83,8 +83,23 @@ const chatSlice = createSlice({
         setCopiedIndex: (state, action) => {
             state.copiedIndex = action.payload
         },
+        appendChunk: (state, action) => {
+            const { chatId, chunk } = action.payload;
+            if (!state.chats[chatId]) return;
+            const msgs = state.chats[chatId].messages;
+            const last = msgs[msgs.length - 1];
+            if (last?.role === "ai") {
+                last.content += chunk;
+            } else {
+                msgs.push({
+                role: "ai",
+                content: chunk
+                });
+            }
+        }
+        
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage, replaceThinkingMessage, removeThinkingMessage, setCopiedIndex } = chatSlice.actions
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage, replaceThinkingMessage, removeThinkingMessage, setCopiedIndex ,appendChunk } = chatSlice.actions
 export default chatSlice.reducer

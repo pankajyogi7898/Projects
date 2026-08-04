@@ -2,8 +2,8 @@ import { initializeSocketConnection } from "../service/chat.socket"
 import { sendMessage, getChats, getMessages, deleteChat } from "../service/chat.api";
 import {
     setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
-    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex
-} from "../chat.slice";
+    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex , appendChunk } from "../chat.slice";
+import { getSocket } from "../service/chat.socket";
 
 import { useDispatch } from "react-redux";
 
@@ -93,6 +93,16 @@ export const useChat = () => {
         }
         dispatch(setCurrentChatId(chatId))
     }
+    function initializeStreamListener(currentChatId) {
+        const socket = getSocket();
+        socket.off("ai-stream");
+        socket.on("ai-stream", ({ chunk }) => {
+            dispatch(appendChunk({
+                chatId: currentChatId,
+                chunk,
+            }));
+        });
+    }
 
     const handleCopyMessage = (content, index) => {
         navigator.clipboard.writeText(content)
@@ -107,6 +117,7 @@ export const useChat = () => {
     return {
         initializeSocketConnection,
         handleSendMessage,
+        initializeStreamListener,
         handlegetChats,
         handleOpenChat,
         handleCopyMessage,

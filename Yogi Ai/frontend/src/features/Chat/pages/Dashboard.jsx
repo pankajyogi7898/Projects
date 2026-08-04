@@ -18,6 +18,12 @@ const Dashboard = () => {
         chat.handlegetChats()
     }, [])
 
+    useEffect(() => {
+        if (currentChatId) {
+            chat.initializeStreamListener(currentChatId);
+        }
+    }, [currentChatId])
+
     const handleSubmitMessage = (event) => {
         event.preventDefault()
 

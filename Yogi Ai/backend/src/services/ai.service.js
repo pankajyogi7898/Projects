@@ -1,7 +1,8 @@
 import { ChatMistralAI, MistralAI } from '@langchain/mistralai';
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, SystemMessage, AIMessage, } from '@langchain/core/messages';
+import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { tool, createAgent } from "langchain"
+import { getIO } from "../sockets/server.socket.js";
 import { searchInternet } from './internet.service.js';
 import * as z from "zod"
 
@@ -31,59 +32,92 @@ const agent = createAgent({
     tools: [searchInternetTool]
 })
 
-// export async function responseGenerate(messages) {
-//     console.log("Before invoke");
+export async function responseGenerateStream({
+    messages,
+    socketId
+}) {
+    const io = getIO();
+    const stream = await agent.stream(
+        {
+            messages: [
+                new SystemMessage(`
+You are Yogi AI.
+Always answer in beautiful markdown.
+Rules:
+//- Use H1/H2/H3 headings.
+//- Use bullet points.
+//- Use numbered lists whenever appropriate.
+//- Use tables for comparisons.
+//- Use **bold** for important concepts.
+//- Use emojis where they improve readability.
+//- Use fenced code blocks with language names.
+//- Leave blank lines between sections.
+//- Never reply in one long paragraph.
+//- Make answers visually attractive like ChatGPT or Claude.
+//- If explaining programming, always include examples and code.
+                `),
+                ...messages.map(msg =>
+                    msg.role === "user"
+                        ? new HumanMessage(msg.content)
+                        : new AIMessage(msg.content)
+                )
+            ]
+        },
+        {
+            streamMode: "messages"
+        }
+    );
+    let finalAnswer = "";
+    for await (const chunk of stream) {
+        const messageChunk = chunk[0];
+        const text = messageChunk?.kwargs?.content;
+        if (!text) continue;
+        finalAnswer += text;
+        io.to(socketId).emit("ai-stream", {
+            chunk: text
+        });
+        console.log("RAW CHUNK =>", chunk);
+        console.log("FIRST =>", chunk[0]);
+        console.log("KWARGS =>", chunk[0]?.kwargs);
+        console.log("CONTENT =>", chunk[0]?.kwargs?.content);
+    }
+    io.to(socketId).emit("ai-end");
+    
+    return finalAnswer;
+}
 
+// export async function responseGenerate(messages) {
 //     const response = await agent.invoke({
 //         messages: [
-//             new SystemMessage("You are Yogi AI"),
-//             ...messages.map(msg =>
-//                 msg.role === "user"
-//                     ? new HumanMessage(msg.content)
-//                     : new AIMessage(msg.content)
-//             )
+//             new SystemMessage(`
+//                                 You are Yogi AI, a professional AI assistant.
+
+//                                 Always respond in beautiful GitHub Markdown.
+
+//                             Rules:
+//                                 - Use H1/H2/H3 headings.
+//                                 - Use bullet points.
+//                                 - Use numbered lists whenever appropriate.
+//                                 - Use tables for comparisons.
+//                                 - Use **bold** for important concepts.
+//                                 - Use emojis where they improve readability.
+//                                 - Use fenced code blocks with language names.
+//                                 - Leave blank lines between sections.
+//                                 - Never reply in one long paragraph.
+//                                 - Make answers visually attractive like ChatGPT or Claude.
+//                                 - If explaining programming, always include examples and code.`),
+//             ...messages.map(msg => {
+//                 if (msg.role === "user") {
+//                     return new HumanMessage(msg.content);
+//                 } else {
+//                     return new AIMessage(msg.content);
+//                 }
+//             })
 //         ]
-//     });
+//     })
 
-//     console.log("After invoke");
-//     console.log(response);
-
-//     return response.messages.at(-1).text;
+//     return response.messages[response.messages.length - 1].text
 // }
-
-
-export async function responseGenerate(messages) {
-    const response = await agent.invoke({
-        messages: [
-            new SystemMessage(`
-                                You are Yogi AI, a professional AI assistant.
-
-                                Always respond in beautiful GitHub Markdown.
-
-                            Rules:
-                                - Use H1/H2/H3 headings.
-                                - Use bullet points.
-                                - Use numbered lists whenever appropriate.
-                                - Use tables for comparisons.
-                                - Use **bold** for important concepts.
-                                - Use emojis where they improve readability.
-                                - Use fenced code blocks with language names.
-                                - Leave blank lines between sections.
-                                - Never reply in one long paragraph.
-                                - Make answers visually attractive like ChatGPT or Claude.
-                                - If explaining programming, always include examples and code.`),
-            ...messages.map(msg => {
-                if (msg.role === "user") {
-                    return new HumanMessage(msg.content);
-                } else {
-                    return new AIMessage(msg.content);
-                }
-            })
-        ]
-    })
-
-    return response.messages[response.messages.length - 1].text
-}
 
 export async function generateChatTitle(message) {
     const response = await titleModel.invoke([

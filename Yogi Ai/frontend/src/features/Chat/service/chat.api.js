@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getSocket } from "./chat.socket";
 
 const api = axios.create({
     baseURL: "http://localhost:3000",
@@ -7,10 +8,11 @@ const api = axios.create({
 
 
 export const sendMessage = async ({ message, chatId }) => {
-    const response = await api.post("/api/chats/message", { message, chat: chatId })
-    return response.data
-}
 
+    const socket = getSocket();
+    const response = await api.post("/api/chats/message",{message,chat: chatId,socketId: socket.id});
+    return response.data;
+}
 export const getChats = async () => {
     const response = await api.get("/api/chats")
     return response.data
