@@ -70,19 +70,14 @@ Rules:
     let finalAnswer = "";
     for await (const chunk of stream) {
         const messageChunk = chunk[0];
-        const text = messageChunk?.kwargs?.content;
+        const text = messageChunk?.content;
         if (!text) continue;
         finalAnswer += text;
         io.to(socketId).emit("ai-stream", {
             chunk: text
         });
-        console.log("RAW CHUNK =>", chunk);
-        console.log("FIRST =>", chunk[0]);
-        console.log("KWARGS =>", chunk[0]?.kwargs);
-        console.log("CONTENT =>", chunk[0]?.kwargs?.content);
     }
     io.to(socketId).emit("ai-end");
-    
     return finalAnswer;
 }
 

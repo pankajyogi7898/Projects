@@ -19,7 +19,9 @@ export async function sendMessage(req, res) {
         role: "user"
     })
     const messages = await messageModel.find({ chat: chatId || chat._id })
-    const result = await responseGenerateStream({messages,socketId});
+    const result = await responseGenerateStream({ messages, socketId });
+    console.log("RESULT =>", result);
+    console.log("TYPE =>", typeof result);
     const aimessage = await messageModel.create({
         chat: chatId || chat._id,
         content: result,

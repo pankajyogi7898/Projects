@@ -2,7 +2,8 @@ import { initializeSocketConnection } from "../service/chat.socket"
 import { sendMessage, getChats, getMessages, deleteChat } from "../service/chat.api";
 import {
     setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
-    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex , appendChunk } from "../chat.slice";
+    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk
+} from "../chat.slice";
 import { getSocket } from "../service/chat.socket";
 
 import { useDispatch } from "react-redux";
@@ -93,14 +94,22 @@ export const useChat = () => {
         }
         dispatch(setCurrentChatId(chatId))
     }
+
     function initializeStreamListener(currentChatId) {
         const socket = getSocket();
+        if (!socket) return;
         socket.off("ai-stream");
+        socket.off("ai-end");
         socket.on("ai-stream", ({ chunk }) => {
-            dispatch(appendChunk({
-                chatId: currentChatId,
-                chunk,
-            }));
+            dispatch(
+                appendChunk({
+                    chatId: currentChatId,
+                    chunk,
+                })
+            );
+        });
+        socket.on("ai-end", () => {
+            console.log("AI Response Completed");
         });
     }
 
