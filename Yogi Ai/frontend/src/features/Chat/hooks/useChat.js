@@ -2,11 +2,14 @@ import { initializeSocketConnection } from "../service/chat.socket"
 import { sendMessage, getChats, getMessages, deleteChat } from "../service/chat.api";
 import {
     setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
-    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk
+    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, stopStreaming,
 } from "../chat.slice";
 import { getSocket } from "../service/chat.socket";
 
 import { useDispatch } from "react-redux";
+
+let typingQueue = [];
+let isTyping = false;
 
 export const useChat = () => {
     const dispatch = useDispatch()
@@ -22,9 +25,11 @@ export const useChat = () => {
                     content: message,
                     role: "user"
                 }));
+                console.log("before thinking message dispatch")
                 dispatch(addThinkingMessage({
                     chatId: activeChatId
                 }));
+                console.log("after thinking message dispatch")
             }
             const data = await sendMessage({
                 message,
@@ -44,10 +49,6 @@ export const useChat = () => {
                 }));
                 activeChatId = chat._id;
             }
-            dispatch(replaceThinkingMessage({
-                chatId: activeChatId,
-                content: aimessage.content
-            }));
             dispatch(setCurrentChatId(activeChatId));
         } catch (err) {
             if (activeChatId) {
@@ -98,8 +99,10 @@ export const useChat = () => {
     function initializeStreamListener(currentChatId) {
         const socket = getSocket();
         if (!socket) return;
+
         socket.off("ai-stream");
         socket.off("ai-end");
+
         socket.on("ai-stream", ({ chunk }) => {
             dispatch(
                 appendChunk({
@@ -108,8 +111,11 @@ export const useChat = () => {
                 })
             );
         });
+
         socket.on("ai-end", () => {
-            console.log("AI Response Completed");
+            dispatch(stopStreaming({
+                chatId: currentChatId,
+            }));
         });
     }
 
@@ -121,6 +127,25 @@ export const useChat = () => {
 
     const handleCreateNewChat = () => {
         dispatch(setCurrentChatId(null))
+    }
+
+    function processQueue(currentChatId, dispatch) {
+        if (isTyping) return;
+        isTyping = true;
+        const typing = setInterval(() => {
+            if (typingQueue.length === 0) {
+                clearInterval(typing);
+                isTyping = false;
+                return;
+            }
+            const letter = typingQueue.shift();
+            dispatch(
+                appendChunk({
+                    chatId: currentChatId,
+                    chunk: letter
+                })
+            );
+        }, 12);
     }
 
     return {

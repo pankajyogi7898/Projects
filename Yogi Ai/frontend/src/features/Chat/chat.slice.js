@@ -88,18 +88,25 @@ const chatSlice = createSlice({
             if (!state.chats[chatId]) return;
             const msgs = state.chats[chatId].messages;
             const last = msgs[msgs.length - 1];
-            if (last?.role === "ai") {
+            if (last?.role === "ai" && last.thinking) {
+                last.thinking = false;
+                last.streaming = true;
+                last.content = chunk;
+            } else if (last?.role === "ai") {
                 last.content += chunk;
-            } else {
-                msgs.push({
-                role: "ai",
-                content: chunk
-                });
             }
-        }
-        
+        },
+        stopStreaming: (state, action) => {
+            const { chatId } = action.payload;
+            if (!state.chats[chatId]) return;
+            const msgs = state.chats[chatId].messages;
+            const last = msgs[msgs.length - 1];
+            if (last?.role === "ai") {
+                last.streaming = false;
+            }
+        },
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage, replaceThinkingMessage, removeThinkingMessage, setCopiedIndex ,appendChunk } = chatSlice.actions
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage, replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, stopStreaming } = chatSlice.actions
 export default chatSlice.reducer

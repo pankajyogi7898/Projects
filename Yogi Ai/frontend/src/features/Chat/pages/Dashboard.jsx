@@ -172,67 +172,79 @@ const Dashboard = () => {
                                         }`}
                                 >
                                     {message.role === 'ai' ? (
-                                        <>
-                                            <div className='prose prose-invert text-sm leading-7 prose-p:my-0'>
-                                                <ReactMarkdown
-                                                    components={{
-                                                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-7 text-white/90">{children}</p>,
-                                                        h1: ({ children }) => <h1 className="mb-4 text-3xl font-bold">{children}</h1>,
-                                                        h2: ({ children }) => <h2 className="mb-3 text-2xl font-semibold">{children}</h2>,
-                                                        h3: ({ children }) => <h3 className="mb-2 text-xl font-semibold">{children}</h3>,
-                                                        ul: ({ children }) => <ul className="mb-3 list-disc pl-6 space-y-1">{children}</ul>,
-                                                        ol: ({ children }) => <ol className="mb-3 list-decimal pl-6 space-y-1">{children}</ol>,
-                                                        li: ({ children }) => <li className="leading-7">{children}</li>,
-                                                        strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
-                                                        em: ({ children }) => <em className="italic">{children}</em>,
-                                                        blockquote: ({ children }) => <blockquote className="my-3 border-l-4 border-cyan-500 pl-4 italic text-white/70">{children}</blockquote>,
-                                                        a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer" className="text-cyan-400 underline">{children}</a>,
-                                                        hr: () => <hr className="my-5 border-white/10" />,
-                                                        code: ({ children }) => <code className="rounded px-1.5 py-0.5 font-mono text-sm">{children}</code>,
-                                                        pre: ({ children }) => <pre className="my-3 overflow-x-auto rounded-xl bg-zinc-900 p-4">{children}</pre>,
-                                                    }}
-                                                >{message.content}</ReactMarkdown>
+                                        message.thinking ? (
+                                            <div className="flex items-center gap-2 py-2">
+                                                <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400"></div>
+                                                <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:150ms]"></div>
+                                                <div className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:300ms]"></div>
+                                                <span className="ml-2 text-sm text-gray-400">
+                                                    Thinking...
+                                                </span>
+
                                             </div>
 
-                                            <div className='mt-3 flex flex-row items-center gap-6 text-white'>
-                                                <button
-                                                    type='button'
-                                                    onClick={() => chat.handleCopyMessage(message.content, index)}
-                                                    className='transition hover:text-white'
-                                                >
-                                                    {copiedIndex === index ? (
-                                                        <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-                                                            <path d='M20 6L9 17l-5-5' />
-                                                        </svg>
-                                                    ) : (
+                                        ) : (
+                                            <>
+                                                <div className='prose prose-invert text-sm leading-7 prose-p:my-0'>
+                                                    <ReactMarkdown
+                                                        components={{
+                                                            p: ({ children }) => <p className="mb-2 last:mb-0 leading-7 text-white/90">{children}</p>,
+                                                            h1: ({ children }) => <h1 className="mb-4 text-3xl font-bold">{children}</h1>,
+                                                            h2: ({ children }) => <h2 className="mb-3 text-2xl font-semibold">{children}</h2>,
+                                                            h3: ({ children }) => <h3 className="mb-2 text-xl font-semibold">{children}</h3>,
+                                                            ul: ({ children }) => <ul className="mb-3 list-disc pl-6 space-y-1">{children}</ul>,
+                                                            ol: ({ children }) => <ol className="mb-3 list-decimal pl-6 space-y-1">{children}</ol>,
+                                                            li: ({ children }) => <li className="leading-7">{children}</li>,
+                                                            strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                                                            em: ({ children }) => <em className="italic">{children}</em>,
+                                                            blockquote: ({ children }) => <blockquote className="my-3 border-l-4 border-cyan-500 pl-4 italic text-white/70">{children}</blockquote>,
+                                                            a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer" className="text-cyan-400 underline">{children}</a>,
+                                                            hr: () => <hr className="my-5 border-white/10" />,
+                                                            code: ({ children }) => <code className="rounded px-1.5 py-0.5 font-mono text-sm">{children}</code>,
+                                                            pre: ({ children }) => <pre className="my-3 overflow-x-auto rounded-xl bg-zinc-900 p-4">{children}</pre>,
+                                                        }}
+                                                    >{message.content}</ReactMarkdown>
+                                                    
+                                                </div>
+                                                <div className='mt-3 flex flex-row items-center gap-6 text-white'>
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => chat.handleCopyMessage(message.content, index)}
+                                                        className='transition hover:text-white'
+                                                    >
+                                                        {copiedIndex === index ? (
+                                                            <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                                                                <path d='M20 6L9 17l-5-5' />
+                                                            </svg>
+                                                        ) : (
+                                                            <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
+                                                                <rect x='9' y='9' width='11' height='11' rx='2' />
+                                                                <path d='M5 15V5a2 2 0 012-2h10' />
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => chat.handleFeedback(index, 'up')}
+                                                        className='transition hover:text-white'
+                                                    >
                                                         <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
-                                                            <rect x='9' y='9' width='11' height='11' rx='2' />
-                                                            <path d='M5 15V5a2 2 0 012-2h10' />
+                                                            <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
                                                         </svg>
-                                                    )}
-                                                </button>
+                                                    </button>
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => chat.handleFeedback(index, 'down')}
+                                                        className='transition hover:text-white'
+                                                    >
+                                                        <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6' transform='rotate(180 2 2)'>
+                                                            <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </>
 
-                                                <button
-                                                    type='button'
-                                                    onClick={() => chat.handleFeedback(index, 'up')}
-                                                    className='transition hover:text-white'
-                                                >
-                                                    <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
-                                                        <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
-                                                    </svg>
-                                                </button>
-
-                                                <button
-                                                    type='button'
-                                                    onClick={() => chat.handleFeedback(index, 'down')}
-                                                    className='transition hover:text-white'
-                                                >
-                                                    <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6' transform='rotate(180 2 2)'>
-                                                        <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </>
+                                        )
                                     ) : (
                                         <p className='whitespace-pre-line'>{message.content}</p>
                                     )}
@@ -266,7 +278,7 @@ const Dashboard = () => {
                     </>
                 )}
             </section>
-        </main>
+        </main >
     )
 }
 
