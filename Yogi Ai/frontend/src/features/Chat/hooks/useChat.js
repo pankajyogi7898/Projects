@@ -1,7 +1,7 @@
 import { initializeSocketConnection } from "../service/chat.socket"
 import { sendMessage, getChats, getMessages, deleteChat } from "../service/chat.api";
 import {
-    setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
+    setChats, removeChat, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
     replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, stopStreaming,
 } from "../chat.slice";
 import { getSocket } from "../service/chat.socket";
@@ -129,24 +129,34 @@ export const useChat = () => {
         dispatch(setCurrentChatId(null))
     }
 
-    function processQueue(currentChatId, dispatch) {
-        if (isTyping) return;
-        isTyping = true;
-        const typing = setInterval(() => {
-            if (typingQueue.length === 0) {
-                clearInterval(typing);
-                isTyping = false;
-                return;
-            }
-            const letter = typingQueue.shift();
-            dispatch(
-                appendChunk({
-                    chatId: currentChatId,
-                    chunk: letter
-                })
-            );
-        }, 12);
+    async function handleDeleteChat(chatId) {
+        try {
+            await deleteChat(chatId)
+            dispatch(removeChat({ chatId }))
+        } catch (err) {
+            console.log(err)
+            dispatch(setError("Failed to delete chat"))
+        }
     }
+
+    // function processQueue(currentChatId, dispatch) {
+    //     if (isTyping) return;
+    //     isTyping = true;
+    //     const typing = setInterval(() => {
+    //         if (typingQueue.length === 0) {
+    //             clearInterval(typing);
+    //             isTyping = false;
+    //             return;
+    //         }
+    //         const letter = typingQueue.shift();
+    //         dispatch(
+    //             appendChunk({
+    //                 chatId: currentChatId,
+    //                 chunk: letter
+    //             })
+    //         );
+    //     }, 12);
+    // }
 
     return {
         initializeSocketConnection,
@@ -155,7 +165,8 @@ export const useChat = () => {
         handlegetChats,
         handleOpenChat,
         handleCopyMessage,
-        handleCreateNewChat
+        handleCreateNewChat,
+        handleDeleteChat
     }
 }
 

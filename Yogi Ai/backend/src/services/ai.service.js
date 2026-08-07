@@ -51,10 +51,8 @@ Rules:
 //- Use **bold** for important concepts.
 //- Use emojis where they improve readability.
 //- Use fenced code blocks with language names.
-//- Leave blank lines between sections.
 //- Never reply in one long paragraph.
 //- Make answers visually attractive like ChatGPT or Claude.
-//- If explaining programming, always include examples and code.
                 `),
                 ...messages.map(msg =>
                     msg.role === "user"

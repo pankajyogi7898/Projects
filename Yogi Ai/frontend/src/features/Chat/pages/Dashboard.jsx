@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import ReactMarkdown from 'react-markdown'
 import { useChat } from '../hooks/useChat'
@@ -12,6 +12,15 @@ const Dashboard = () => {
     const chats = useSelector((state) => state.chat.chats)
     const currentChatId = useSelector((state) => state.chat.currentChatId)
     const copiedIndex = useSelector((state) => state.chat.copiedIndex)
+    const bottomRef = useRef(null);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [
+        chats[currentChatId]?.messages
+    ]);
 
     useEffect(() => {
         chat.initializeSocketConnection()
@@ -79,15 +88,45 @@ const Dashboard = () => {
                     <p className='mb-2 px-3 text-[11px] font-semibold uppercase tracking-wide text-white/40'>Recent</p>
                     <div className='space-y-1'>
                         {chatList.slice(0, 6).map((c, index) => (
-                            <button
+                            <div
                                 key={index}
-                                type='button'
-                                onClick={() => openChat(c.id)}
-                                className={`w-full truncate rounded-lg px-3 py-2 text-left text-sm transition hover:bg-white/5 hover:text-white ${c.id === currentChatId ? 'bg-white/5 text-white' : 'text-white/60'
-                                    }`}
+                                className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition hover:bg-white/5 ${c.id === currentChatId ? 'bg-white/5 text-white' : 'text-white/60'}`}
                             >
-                                {c.title}
-                            </button>
+                                <button
+                                    type='button'
+                                    onClick={() => openChat(c.id)}
+                                    className='flex-1 truncate text-left hover:text-white'
+                                >
+                                    {c.title}
+                                </button>
+                                <button
+                                    type='button'
+                                    onClick={(event) => {
+                                        event.stopPropagation()
+                                        chat.handleDeleteChat(c.id)
+                                    }}
+                                    className='ml-2 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-red-400 transition hover:bg-white/10 hover:text-red-300'
+                                    aria-label={`Delete ${c.title}`}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <path d="M3 6h18" />
+                                        <path d="M8 6V4h8v2" />
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                        <path d="M10 11v6" />
+                                        <path d="M14 11v6" />
+                                    </svg>
+                                </button>
+                            </div>
                         ))}
                     </div>
                     {chatList.length > 6 && (
@@ -204,7 +243,7 @@ const Dashboard = () => {
                                                             pre: ({ children }) => <pre className="my-3 overflow-x-auto rounded-xl bg-zinc-900 p-4">{children}</pre>,
                                                         }}
                                                     >{message.content}</ReactMarkdown>
-                                                    
+
                                                 </div>
                                                 <div className='mt-3 flex flex-row items-center gap-6 text-white'>
                                                     <button
@@ -250,6 +289,7 @@ const Dashboard = () => {
                                     )}
                                 </div>
                             ))}
+                            <div ref={bottomRef}></div>
                         </div>
 
                         <div className='px-6 pb-6'>
