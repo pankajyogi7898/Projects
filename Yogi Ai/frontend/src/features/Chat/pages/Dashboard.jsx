@@ -79,20 +79,22 @@ const Dashboard = () => {
         <main className='flex min-h-screen w-full bg-black text-white'>
             {/* Sidebar */}
             <aside className='hidden h-screen w-64 flex-col border-r border-white/10 bg-black px-3 py-4 md:flex'>
-                <div className='mb-6 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2.5 text-sm font-medium text-white'>
+                <div className='mb-6 flex items-center gap-2 rounded-lg bg-white/500 px-3 py-2.5 text-sm font-medium text-white'>
                     <img
                         src="/logo.png"
                         alt="Yogi AI"
-                        className="h-7 w-auto object-contain"
+                        className="yogi-logo-dark h-10 w-auto object-contain"
+                    />
+
+                    <img
+                        src="/logowhite.png"
+                        alt="Yogi AI"
+                        className="yogi-logo-light h-10 w-auto object-contain"
                     />
                     <h1 className='text-xl'>Yogi Ai</h1>
                 </div>
 
                 <nav className='space-y-1 text-sm text-white/70'>
-                    <button type='button' className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-white/5 hover:text-white'>
-                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'><circle cx='12' cy='12' r='9' /><path d='M12 7v5l3 2' /></svg>
-                        Chats
-                    </button>
 
                     <button type='button' className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-white/5 hover:text-white'>
                         <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'><rect x='3' y='3' width='18' height='18' rx='4' /><circle cx='12' cy='12' r='4' /></svg>
@@ -180,7 +182,13 @@ const Dashboard = () => {
                             <img
                                 src="/yogiai.png"
                                 alt="Yogi AI"
-                                className="h-50 w-auto object-contain"
+                                className="yogi-logo-dark h-70 w-auto object-contain"
+                            />
+
+                            <img
+                                src="/yogiaiwhite.png"
+                                alt="Yogi AI"
+                                className="yogi-logo-light h-70 w-auto object-contain"
                             />
                         </div>
 

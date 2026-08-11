@@ -1,7 +1,7 @@
 html.light body,
 html.light main.bg-black {
     background-color: #ffffff !important;
-    color: #0a0a0a !important;
+    color: #111111 !important;
 }
 
 html.light aside,
@@ -9,25 +9,106 @@ html.light .bg-black {
     background-color: #ffffff !important;
 }
 
+/* Main text */
 html.light .text-white {
-    color: #0a0a0a !important;
+    color: #111111 !important;
 }
 
-html.light .text-white\/70,
-html.light .text-white\/60,
-html.light .text-white\/50,
-html.light .text-white\/40,
-html.light .text-white\/80,
+/* Different text opacity ko preserve karo */
 html.light .text-white\/90 {
-    color: rgba(10, 10, 10, 0.65) !important;
+    color: rgba(17, 17, 17, 0.90) !important;
 }
 
-html.light .border-white\/10,
+html.light .text-white\/80 {
+    color: rgba(17, 17, 17, 0.80) !important;
+}
+
+html.light .text-white\/70 {
+    color: rgba(17, 17, 17, 0.70) !important;
+}
+
+html.light .text-white\/60 {
+    color: rgba(17, 17, 17, 0.60) !important;
+}
+
+html.light .text-white\/50 {
+    color: rgba(17, 17, 17, 0.50) !important;
+}
+
+html.light .text-white\/40 {
+    color: rgba(17, 17, 17, 0.40) !important;
+}
+
+/* Borders */
+html.light .border-white\/10 {
+    border-color: rgba(0, 0, 0, 0.10) !important;
+}
+
 html.light .border-white\/15 {
-    border-color: rgba(0, 0, 0, 0.12) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
 }
 
-html.light .bg-white\/5,
+/* Existing subtle backgrounds */
+html.light .bg-white\/5 {
+    background-color: rgba(0, 0, 0, 0.035) !important;
+}
+
 html.light .bg-white\/10 {
-    background-color: rgba(0, 0, 0, 0.05) !important;
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Light mode - better visibility */
+
+html.light .text-white\/60 {
+    color: rgba(17, 17, 17, 0.75) !important;
+}
+
+html.light .text-white\/70 {
+    color: rgba(17, 17, 17, 0.80) !important;
+}
+
+html.light .text-white\/80 {
+    color: rgba(17, 17, 17, 0.88) !important;
+}
+
+html.light .text-white\/90 {
+    color: rgba(17, 17, 17, 0.95) !important;
+}
+
+html.light pre {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+html.light pre code {
+    color: #1f2937 !important;
+}
+
+/* Input / textarea placeholder */
+html.light input::placeholder,
+html.light textarea::placeholder {
+    color: rgba(54, 53, 53, 0.355) !important;
+    opacity: 1 !important;
+}
+
+/* Icons */
+html.light svg {
+    color: rgba(17, 17, 17, 0.70);
+}
+
+/* Suggestion buttons */
+html.light button {
+    color: rgba(17, 17, 17, 0.75);
+}
+
+.yogi-logo-light {
+    display: none;
+}
+
+html.light .yogi-logo-dark {
+    display: none;
+}
+
+html.light .yogi-logo-light {
+    display: block;
 }
