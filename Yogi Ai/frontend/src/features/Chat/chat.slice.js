@@ -112,8 +112,23 @@ const chatSlice = createSlice({
                 last.streaming = false;
             }
         },
+        replaceChatId: (state, action) => {
+            const { oldChatId, newChatId, title } = action.payload;
+            const oldChat = state.chats[oldChatId];
+            if (!oldChat) return;
+            state.chats[newChatId] = {
+                ...oldChat,
+                id: newChatId,
+                title: title || oldChat.title
+            };
+            delete state.chats[oldChatId];
+
+            if (state.currentChatId === oldChatId) {
+                state.currentChatId = newChatId;
+            }
+        },
     }
 })
 
-export const { setChats, removeChat, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage, replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, stopStreaming } = chatSlice.actions
+export const { setChats, removeChat, setCurrentChatId, replaceChatId, setLoading, setError, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage, replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, stopStreaming } = chatSlice.actions
 export default chatSlice.reducer

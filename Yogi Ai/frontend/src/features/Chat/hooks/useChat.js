@@ -2,7 +2,7 @@ import { initializeSocketConnection } from "../service/chat.socket"
 import { sendMessage, getChats, getMessages, deleteChat } from "../service/chat.api";
 import {
     setChats, removeChat, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, addMessages, addOptimisticMessage, addThinkingMessage,
-    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, stopStreaming,
+    replaceThinkingMessage, removeThinkingMessage, setCopiedIndex, appendChunk, replaceChatId,stopStreaming,
 } from "../chat.slice";
 import { getSocket } from "../service/chat.socket";
 
@@ -17,50 +17,57 @@ export const useChat = () => {
     async function handleSendMessage({ message, chatId }) {
         dispatch(setLoading(true));
         let activeChatId = chatId;
+        let tempChatId = null;
         try {
-            // Agar pehle se chat hai to user message turant dikhao
-            if (activeChatId) {
-                dispatch(addOptimisticMessage({
+
+            if (!activeChatId) {
+
+                tempChatId = `temp-${Date.now()}`;
+                activeChatId = tempChatId;
+
+                dispatch(createNewChat({
                     chatId: activeChatId,
-                    content: message,
-                    role: "user"
+                    title: "New Chat"
                 }));
-                console.log("before thinking message dispatch")
-                dispatch(addThinkingMessage({
-                    chatId: activeChatId
-                }));
-                console.log("after thinking message dispatch")
+
+                dispatch(setCurrentChatId(activeChatId));
+
             }
+
+            dispatch(addOptimisticMessage({
+                chatId: activeChatId,
+                content: message,
+                role: "user"
+            }));
+
+            dispatch(addThinkingMessage({
+                chatId: activeChatId
+            }));
+
             const data = await sendMessage({
                 message,
-                chatId: activeChatId
+                chatId: chatId || null
             });
-            const { chat, aimessage } = data;
-            // Agar naya chat tha
-            if (!activeChatId) {
-                dispatch(createNewChat({
-                    chatId: chat._id,
+            const { chat } = data;
+
+            if (tempChatId) {
+                dispatch(replaceChatId({
+                    oldChatId: tempChatId,
+                    newChatId: chat._id,
                     title: chat.title
-                }));
-                dispatch(addNewMessage({
-                    chatId: chat._id,
-                    content: message,
-                    role: "user"
                 }));
                 activeChatId = chat._id;
             }
-            dispatch(setCurrentChatId(activeChatId));
         } catch (err) {
+            console.log(err);
             if (activeChatId) {
                 dispatch(removeThinkingMessage({
                     chatId: activeChatId
                 }));
             }
-            console.log(err);
         } finally {
             dispatch(setLoading(false));
         }
-
     }
 
     async function handlegetChats() {

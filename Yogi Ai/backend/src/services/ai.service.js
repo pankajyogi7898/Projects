@@ -1,6 +1,6 @@
 import { ChatMistralAI, MistralAI } from '@langchain/mistralai';
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage, SystemMessage, AIMessageChunk } from "@langchain/core/messages";
 import { tool, createAgent } from "langchain"
 import { getIO } from "../sockets/server.socket.js";
 import { searchInternet } from './internet.service.js';
@@ -41,19 +41,22 @@ export async function responseGenerateStream({
         {
             messages: [
                 new SystemMessage(`
-You are Yogi AI.
-Always answer in beautiful markdown.
+You are Yogi AI, a professional AI assistant.
+Always answer in beautiful GitHub Markdown.
+
 Rules:
-//- Use H1/H2/H3 headings.
-//- Use bullet points.
-//- Use numbered lists whenever appropriate.
-//- Use tables for comparisons.
-//- Use **bold** for important concepts.
-//- Use emojis where they improve readability.
-//- Use fenced code blocks with language names.
-//- Never reply in one long paragraph.
-//- Make answers visually attractive like ChatGPT or Claude.
-                `),
+- Use H1/H2/H3 headings.
+- Use bullet points.
+- Use numbered lists whenever appropriate.
+- Use tables for comparisons.
+- Use **bold** for important concepts.
+- Use emojis where they improve readability.
+- Leave blank lines between sections.
+- Never reply in one long paragraph.
+- Never show raw tool results to the user.
+- If you use the internet search tool, read and understand its results first.
+- Then give the user a clean, useful answer based on those results.
+        `),
                 ...messages.map(msg =>
                     msg.role === "user"
                         ? new HumanMessage(msg.content)
@@ -68,8 +71,13 @@ Rules:
     let finalAnswer = "";
     for await (const chunk of stream) {
         const messageChunk = chunk[0];
-        const text = messageChunk?.content;
-        if (!text) continue;
+        if (!(messageChunk instanceof AIMessageChunk)) {
+            continue;
+        }
+        const text = messageChunk.content;
+        if (!text || typeof text !== "string") {
+            continue;
+        }
         finalAnswer += text;
         io.to(socketId).emit("ai-stream", {
             chunk: text
@@ -78,7 +86,6 @@ Rules:
     io.to(socketId).emit("ai-end");
     return finalAnswer;
 }
-
 // export async function responseGenerate(messages) {
 //     const response = await agent.invoke({
 //         messages: [

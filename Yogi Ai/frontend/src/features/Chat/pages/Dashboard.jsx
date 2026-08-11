@@ -48,6 +48,29 @@ const Dashboard = () => {
     const openChat = (chatId) => {
         chat.handleOpenChat(chatId, chats)
     }
+    const handleSuggestionClick = (suggestion) => {
+        const prompts = {
+            "Trending Tech":
+                "What are the latest trending technologies and explain them briefly?",
+
+            "Startups":
+                "What are the latest interesting startup trends and ideas?",
+
+            "AI Tools":
+                "What are the best and latest AI tools available right now?",
+
+            "Gadgets":
+                "What are the latest interesting gadgets and technologies?"
+        };
+        const message = prompts[suggestion];
+        if (!message) return;
+        setChatInput(message);
+        chat.handleSendMessage({
+            message,
+            chatId: currentChatId
+        });
+        setChatInput('');
+    };
 
     const hasMessages = chats[currentChatId]?.messages.length > 0
     const chatList = Object.values(chats)
@@ -57,10 +80,12 @@ const Dashboard = () => {
             {/* Sidebar */}
             <aside className='hidden h-screen w-64 flex-col border-r border-white/10 bg-black px-3 py-4 md:flex'>
                 <div className='mb-6 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2.5 text-sm font-medium text-white'>
-                    <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
-                        <path d='M12 2l2.2 4.6L19 8l-3.6 3.2.9 5-4.3-2.5-4.3 2.5.9-5L5 8l4.8-1.4z' />
-                    </svg>
-                    Search
+                    <img
+                        src="/logo.png"
+                        alt="Yogi AI"
+                        className="h-7 w-auto object-contain"
+                    />
+                    <h1 className='text-xl'>Yogi Ai</h1>
                 </div>
 
                 <nav className='space-y-1 text-sm text-white/70'>
@@ -151,21 +176,28 @@ const Dashboard = () => {
             <section className='flex h-screen flex-1 flex-col'>
                 {!hasMessages ? (
                     <div className='flex flex-1 flex-col items-center justify-center px-4'>
-                        <div className='mb-10 flex items-center gap-3'>
-                            <svg width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.3'>
-                                <path d='M12 2l2.2 4.6L19 8l-3.6 3.2.9 5-4.3-2.5-4.3 2.5.9-5L5 8l4.8-1.4z' />
-                            </svg>
-                            <h1 className='text-4xl font-light tracking-tight text-white/90'>Yogi AI</h1>
+                        <div className="mb-10 flex items-center gap-3">
+                            <img
+                                src="/yogiai.png"
+                                alt="Yogi AI"
+                                className="h-50 w-auto object-contain"
+                            />
                         </div>
 
-                        <div className='mb-4 flex flex-wrap items-center justify-center gap-2'>
-                            {['Trending Tech', 'Startups', 'AI Tools', 'Gadgets'].map((label) => (
+                        <div className="flex flex-wrap justify-center gap-3">
+                            {[
+                                "Trending Tech",
+                                "Startups",
+                                "AI Tools",
+                                "Gadgets"
+                            ].map((suggestion) => (
                                 <button
-                                    key={label}
-                                    type='button'
-                                    className='rounded-full border border-white/15 px-4 py-2 text-sm text-white/70 transition hover:border-white/30 hover:text-white'
+                                    key={suggestion}
+                                    type="button"
+                                    onClick={() => handleSuggestionClick(suggestion)}
+                                    className="rounded-full border border-white/15 px-4 py-2 text-sm text-slate-300 transition hover:border-cyan-400/50 hover:bg-white/5 hover:text-white"
                                 >
-                                    {label}
+                                    {suggestion}
                                 </button>
                             ))}
                         </div>
@@ -239,46 +271,32 @@ const Dashboard = () => {
                                                             blockquote: ({ children }) => <blockquote className="my-3 border-l-4 border-cyan-500 pl-4 italic text-white/70">{children}</blockquote>,
                                                             a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer" className="text-cyan-400 underline">{children}</a>,
                                                             hr: () => <hr className="my-5 border-white/10" />,
-                                                            code: ({ children }) => <code className="rounded px-1.5 py-0.5 font-mono text-sm">{children}</code>,
                                                             pre: ({ children }) => <pre className="my-3 overflow-x-auto rounded-xl bg-zinc-900 p-4">{children}</pre>,
                                                         }}
                                                     >{message.content}</ReactMarkdown>
 
                                                 </div>
-                                                <div className='mt-3 flex flex-row items-center gap-6 text-white'>
+                                                <div className='mt-5 flex flex-row items-center gap-6 text-white'>
                                                     <button
-                                                        type='button'
+                                                        type="button"
                                                         onClick={() => chat.handleCopyMessage(message.content, index)}
-                                                        className='transition hover:text-white'
+                                                        className="transition hover:text-white"
                                                     >
                                                         {copiedIndex === index ? (
-                                                            <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-                                                                <path d='M20 6L9 17l-5-5' />
+                                                            // Copied
+                                                            <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                                            >
+                                                                <path d="M20 6L9 17l-5-5" />
                                                             </svg>
                                                         ) : (
-                                                            <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
-                                                                <rect x='9' y='9' width='11' height='11' rx='2' />
-                                                                <path d='M5 15V5a2 2 0 012-2h10' />
+                                                            // Copy
+                                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                                                            >
+                                                                <rect x="9" y="9" width="11" height="11" rx="2"
+                                                                />
+                                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                                                             </svg>
                                                         )}
-                                                    </button>
-                                                    <button
-                                                        type='button'
-                                                        onClick={() => chat.handleFeedback(index, 'up')}
-                                                        className='transition hover:text-white'
-                                                    >
-                                                        <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6'>
-                                                            <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
-                                                        </svg>
-                                                    </button>
-                                                    <button
-                                                        type='button'
-                                                        onClick={() => chat.handleFeedback(index, 'down')}
-                                                        className='transition hover:text-white'
-                                                    >
-                                                        <svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.6' transform='rotate(180 2 2)'>
-                                                            <path d='M7 10v11M14 21h4a2 2 0 002-2v-6a2 2 0 00-2-2h-4.5l1-4.5a1.5 1.5 0 00-2.6-1.3L9 10H3v11h4' />
-                                                        </svg>
                                                     </button>
                                                 </div>
                                             </>
