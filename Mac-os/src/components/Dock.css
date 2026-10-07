@@ -1,0 +1,74 @@
+#dock {
+  display: flex;
+  gap: 0.7rem;
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgb(57, 57, 57);
+  padding-inline: 0.5rem;
+  padding-block: 0.5rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(5px);
+}
+#dock .icon {
+  padding: 0.2rem;
+  aspect-ratio: 1/1;
+  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  border-radius: 0.65rem;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+#dock .github {
+  background-color: #181717;
+  /* GitHub */
+}
+#dock .pdf {
+  background-color: #FF0000;
+  /* PDF / Adobe Red */
+}
+#dock .spotify {
+  background-color: #1DB954;
+  /* Spotify */
+}
+#dock .note {
+  background-color: #FFD60A;
+  /* Notes */
+}
+#dock .mail {
+  background-color: #EA4335;
+  /* Gmail */
+}
+#dock .link {
+  background-color: #0A66C2;
+  /* LinkedIn */
+}
+#dock .calender {
+  background-color: #4285F4;
+  /* Google Calendar */
+}
+#dock .cli {
+  background-color: #000000;
+  /* Terminal / CLI */
+}
+#dock .icon:hover {
+  transform: scale(1.25) translateY(-20%);
+}
+#dock .icon:hover + .icon,
+#dock .icon:has(+ .icon:hover) {
+  transform: scale(1.1) translateY(-10%);
+}
+
+@media (max-width: 530px) {
+  #dock {
+    padding-inline: 0.4rem;
+    padding-block: 0.5rem;
+    gap: 0.4rem;
+  }
+  #dock .icon {
+    padding: 1px;
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+}/*# sourceMappingURL=Dock.css.map */

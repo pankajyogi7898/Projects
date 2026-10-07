@@ -1,10 +1,11 @@
-import React from 'react'
 import { Rnd } from 'react-rnd'
 import './window.scss'
 
 const MacWindow = ({ children, width = "40vw", height = "40vh", windowName, setWindowState }) => {
     return (
         <Rnd
+            dragAxis="both"
+            cancel=".dot"
             default={{
                 width: width,
                 height: height,
@@ -23,8 +24,7 @@ const MacWindow = ({ children, width = "40vw", height = "40vh", windowName, setW
                 <div className="nav">
                     <div className="dots">
                         <div
-
-                            onClick={console.log(setWindowState), () => setWindowState(state => ({ ...state, [windowName]: false }))} className="dot red"></div>
+                            onClick={() => setWindowState(state => ({ ...state, [windowName]: false }))} className="dot red"></div>
                         <div className="dot yellow"></div>
                         <div className="dot green"></div>
                     </div>

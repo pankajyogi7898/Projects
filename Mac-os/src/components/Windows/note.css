@@ -1,0 +1,9 @@
+.note-window {
+  padding: 1rem;
+  overflow-y: auto;
+  height: 100%;
+  padding-bottom: 1rem;
+}
+.note-window pre {
+  background-color: transparent !important;
+}/*# sourceMappingURL=note.css.map */
